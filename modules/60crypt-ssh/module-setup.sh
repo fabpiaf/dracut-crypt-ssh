@@ -126,6 +126,11 @@ install() {
     derror "Unable to locate dropbear executable"
     return 1
   fi
+  
+  # create /etc/shells based on /bin/*sh                                                                               
+  # dropbear checks /etc/passwd shell against /etc/shells                                                              
+  # root user is added to passwd in 60systemd-sysusers/module-setup.sh                                                 
+  [ ! -f "${initdir}"/etc/shells ] && find "${initdir}"/bin/ -type f -name "*sh" -printf "/bin/%P\n" > "${initdir}"/etc/shells      
 
   #install the required helpers
   inst "$moddir"/helper/console_auth /bin/console_auth
