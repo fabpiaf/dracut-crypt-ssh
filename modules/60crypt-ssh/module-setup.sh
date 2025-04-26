@@ -127,10 +127,14 @@ install() {
     return 1
   fi
   
-  # create /etc/shells based on /bin/*sh                                                                               
-  # dropbear checks /etc/passwd shell against /etc/shells                                                              
-  # root user is added to passwd in 60systemd-sysusers/module-setup.sh                                                 
-  [ ! -f "${initdir}"/etc/shells ] && find "${initdir}"/bin/ -type f -name "*sh" -printf "/bin/%P\n" > "${initdir}"/etc/shells      
+  # add /bin/bash to /etc/shells
+  # dropbear checks /etc/passwd shell against /etc/shells
+  # root user is added to passwd in 60systemd-sysusers/module-setup.sh
+  # if any other shell than /bin/bash is used, it must be added as well
+  if [ ! -f "${initdir}"/etc/shells ] || ! grep -q /bin/bash "${initdir}"/etc/shells
+  then 
+    echo /bin/bash >> "${initdir}"/etc/shells
+  fi
 
   #install the required helpers
   inst "$moddir"/helper/console_auth /bin/console_auth
